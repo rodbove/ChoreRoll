@@ -3,7 +3,6 @@ package com.choreroll.app.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -17,11 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 @Composable
 fun SlotMachine(
@@ -30,6 +31,8 @@ fun SlotMachine(
 ) {
     val viewportHeight = SlotMachineState.ITEM_HEIGHT_DP * SlotMachineState.VISIBLE_ITEMS
     val shape = RoundedCornerShape(24.dp)
+    val density = LocalDensity.current
+    val itemHeightPx = with(density) { SlotMachineState.ITEM_HEIGHT_DP.toPx() }
 
     Box(
         modifier = modifier
@@ -43,32 +46,33 @@ fun SlotMachine(
                 shape = shape
             )
     ) {
-        // Scrolling column
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .graphicsLayer {
-                    translationY = -state.scrollOffset.value
-                }
-        ) {
-            state.displayList.forEach { task ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(SlotMachineState.ITEM_HEIGHT_DP),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = task.name,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.SemiBold
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 28.dp)
-                    )
-                }
+        // Virtual scrolling: only render items currently in/near viewport
+        val scrollPx = state.scrollOffset.value
+        val firstVisible = (scrollPx / itemHeightPx).toInt() - 1
+        val lastVisible = firstVisible + SlotMachineState.VISIBLE_ITEMS + 2
+
+        for (i in firstVisible..lastVisible) {
+            if (i < 0 || i >= state.displayList.size) continue
+            val task = state.displayList[i]
+            val itemY = (i * itemHeightPx - scrollPx).roundToInt()
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(SlotMachineState.ITEM_HEIGHT_DP)
+                    .offset { IntOffset(0, itemY) },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = task.name,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 28.dp)
+                )
             }
         }
 
