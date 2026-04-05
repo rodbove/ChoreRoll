@@ -11,23 +11,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,15 +59,30 @@ fun AddEditTaskScreen(
         if (uiState.savedSuccessfully) onNavigateBack()
     }
 
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = MaterialTheme.colorScheme.primary,
+        cursorColor = MaterialTheme.colorScheme.primary,
+        focusedLabelColor = MaterialTheme.colorScheme.primary,
+    )
+
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.isEdit) "Edit Task" else "New Task") },
+                title = {
+                    Text(
+                        if (uiState.isEdit) "Edit Task" else "New Task",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { paddingValues ->
@@ -68,10 +90,12 @@ fun AddEditTaskScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            Spacer(Modifier.height(4.dp))
+
             OutlinedTextField(
                 value = uiState.name,
                 onValueChange = viewModel::updateName,
@@ -79,10 +103,12 @@ fun AddEditTaskScreen(
                 isError = uiState.nameError != null,
                 supportingText = uiState.nameError?.let { { Text(it) } },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = textFieldColors
             )
 
-            // Category with autocomplete
+            // Category
             var categoryExpanded by remember { mutableStateOf(false) }
             val filteredCategories = uiState.existingCategories.filter {
                 it.name.contains(uiState.categoryText, ignoreCase = true)
@@ -102,7 +128,9 @@ fun AddEditTaskScreen(
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryEditable)
+                        .menuAnchor(MenuAnchorType.PrimaryEditable),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = textFieldColors
                 )
                 ExposedDropdownMenu(
                     expanded = categoryExpanded && filteredCategories.isNotEmpty(),
@@ -121,29 +149,40 @@ fun AddEditTaskScreen(
                 }
             }
 
-            // Recurrence type
-            Text("Recurrence", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                RecurrenceType.entries.forEach { type ->
-                    FilterChip(
-                        selected = uiState.recurrenceType == type,
-                        onClick = { viewModel.updateRecurrenceType(type) },
-                        label = {
-                            Text(
-                                when (type) {
-                                    RecurrenceType.ONE_TIME -> "One-time"
-                                    RecurrenceType.DAILY -> "Daily"
-                                    RecurrenceType.EVERY_N_DAYS -> "Every N days"
-                                }
+            // Recurrence
+            Column {
+                Text(
+                    "Recurrence",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    RecurrenceType.entries.forEach { type ->
+                        val selected = uiState.recurrenceType == type
+                        FilterChip(
+                            selected = selected,
+                            onClick = { viewModel.updateRecurrenceType(type) },
+                            label = {
+                                Text(
+                                    when (type) {
+                                        RecurrenceType.ONE_TIME -> "One-time"
+                                        RecurrenceType.DAILY -> "Daily"
+                                        RecurrenceType.EVERY_N_DAYS -> "Every N days"
+                                    },
+                                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+                                )
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                             )
-                        }
-                    )
+                        )
+                    }
                 }
             }
 
-            // Interval input (conditional)
             AnimatedVisibility(visible = uiState.recurrenceType == RecurrenceType.EVERY_N_DAYS) {
                 OutlinedTextField(
                     value = uiState.intervalDays,
@@ -153,7 +192,9 @@ fun AddEditTaskScreen(
                     supportingText = uiState.intervalError?.let { { Text(it) } },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = textFieldColors
                 )
             }
 
@@ -162,10 +203,23 @@ fun AddEditTaskScreen(
             Button(
                 onClick = viewModel::save,
                 enabled = !uiState.isSaving,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
-                Text(if (uiState.isEdit) "Save Changes" else "Add Task")
+                Text(
+                    if (uiState.isEdit) "Save Changes" else "Add Task",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

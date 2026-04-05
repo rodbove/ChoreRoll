@@ -1,6 +1,7 @@
 package com.choreroll.app.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -26,15 +29,21 @@ fun SlotMachine(
     modifier: Modifier = Modifier
 ) {
     val viewportHeight = SlotMachineState.ITEM_HEIGHT_DP * SlotMachineState.VISIBLE_ITEMS
+    val shape = RoundedCornerShape(24.dp)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(viewportHeight)
-            .clip(RoundedCornerShape(20.dp))
+            .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                shape = shape
+            )
     ) {
-        // The scrolling column of task names
+        // Scrolling column
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,35 +60,37 @@ fun SlotMachine(
                 ) {
                     Text(
                         text = task.name,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.SemiBold
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 24.dp)
+                        modifier = Modifier.padding(horizontal = 28.dp)
                     )
                 }
             }
         }
 
-        // Selection indicator lines - mark the center "winning" slot
+        // Selection indicator — gold accent lines
         HorizontalDivider(
             modifier = Modifier.offset(y = SlotMachineState.ITEM_HEIGHT_DP),
             thickness = 2.dp,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.secondary
         )
         HorizontalDivider(
             modifier = Modifier.offset(y = SlotMachineState.ITEM_HEIGHT_DP * 2),
             thickness = 2.dp,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.secondary
         )
 
-        // Fade edges at top and bottom for a polished look
+        // Fade edges
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(SlotMachineState.ITEM_HEIGHT_DP)
                 .background(
-                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                    Brush.verticalGradient(
                         colors = listOf(
                             MaterialTheme.colorScheme.surfaceVariant,
                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0f)
@@ -93,7 +104,7 @@ fun SlotMachine(
                 .fillMaxWidth()
                 .height(SlotMachineState.ITEM_HEIGHT_DP)
                 .background(
-                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                    Brush.verticalGradient(
                         colors = listOf(
                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0f),
                             MaterialTheme.colorScheme.surfaceVariant
