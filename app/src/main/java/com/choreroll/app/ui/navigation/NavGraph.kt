@@ -9,8 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -178,7 +178,12 @@ private fun CustomBottomBar(tabs: List<NavItem>) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             tabs.forEach { tab ->
-                CustomNavItem(tab)
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CustomNavItem(tab)
+                }
             }
         }
     }
