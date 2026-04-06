@@ -1,7 +1,11 @@
 package com.choreroll.app.ui.addedittask
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -16,14 +20,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +41,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.choreroll.app.data.model.RecurrenceType
 
@@ -59,11 +62,13 @@ fun AddEditTaskScreen(
         if (uiState.savedSuccessfully) onNavigateBack()
     }
 
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
+    val fieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
         cursorColor = MaterialTheme.colorScheme.primary,
         focusedLabelColor = MaterialTheme.colorScheme.primary,
     )
+    val fieldShape = RoundedCornerShape(16.dp)
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -90,7 +95,7 @@ fun AddEditTaskScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -104,11 +109,10 @@ fun AddEditTaskScreen(
                 supportingText = uiState.nameError?.let { { Text(it) } },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = textFieldColors
+                shape = fieldShape,
+                colors = fieldColors
             )
 
-            // Category
             var categoryExpanded by remember { mutableStateOf(false) }
             val filteredCategories = uiState.existingCategories.filter {
                 it.name.contains(uiState.categoryText, ignoreCase = true)
@@ -129,8 +133,8 @@ fun AddEditTaskScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(MenuAnchorType.PrimaryEditable),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = textFieldColors
+                    shape = fieldShape,
+                    colors = fieldColors
                 )
                 ExposedDropdownMenu(
                     expanded = categoryExpanded && filteredCategories.isNotEmpty(),
@@ -149,36 +153,48 @@ fun AddEditTaskScreen(
                 }
             }
 
-            // Recurrence
+            // Recurrence type
             Column {
                 Text(
-                    "Recurrence",
+                    "RECURRENCE",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    letterSpacing = 1.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 10.dp)
                 )
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     RecurrenceType.entries.forEach { type ->
                         val selected = uiState.recurrenceType == type
-                        FilterChip(
-                            selected = selected,
-                            onClick = { viewModel.updateRecurrenceType(type) },
-                            label = {
-                                Text(
-                                    when (type) {
-                                        RecurrenceType.ONE_TIME -> "One-time"
-                                        RecurrenceType.DAILY -> "Daily"
-                                        RecurrenceType.EVERY_N_DAYS -> "Every N days"
-                                    },
-                                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(
+                                    if (selected)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.surfaceContainer
                                 )
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = { viewModel.updateRecurrenceType(type) }
+                                )
+                                .padding(horizontal = 18.dp, vertical = 12.dp)
+                        ) {
+                            Text(
+                                when (type) {
+                                    RecurrenceType.ONE_TIME -> "One-time"
+                                    RecurrenceType.DAILY -> "Daily"
+                                    RecurrenceType.EVERY_N_DAYS -> "Every N days"
+                                },
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                                fontSize = 14.sp,
+                                color = if (selected)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -193,29 +209,39 @@ fun AddEditTaskScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = textFieldColors
+                    shape = fieldShape,
+                    colors = fieldColors
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(12.dp))
 
-            Button(
-                onClick = viewModel::save,
-                enabled = !uiState.isSaving,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.tertiary
+                            )
+                        )
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        enabled = !uiState.isSaving,
+                        onClick = viewModel::save
+                    ),
+                contentAlignment = androidx.compose.ui.Alignment.Center
             ) {
                 Text(
                     if (uiState.isEdit) "Save Changes" else "Add Task",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 

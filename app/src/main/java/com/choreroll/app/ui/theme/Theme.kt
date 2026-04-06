@@ -1,6 +1,5 @@
 package com.choreroll.app.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -14,97 +13,122 @@ import androidx.compose.ui.unit.sp
 private val LightColorScheme = lightColorScheme(
     primary = Pink,
     onPrimary = White,
-    primaryContainer = PinkLight.copy(alpha = 0.2f),
+    primaryContainer = PinkSoft,
     onPrimaryContainer = PinkDark,
     secondary = Gold,
     onSecondary = TextDark,
-    secondaryContainer = Gold.copy(alpha = 0.2f),
+    secondaryContainer = GoldSoft,
     onSecondaryContainer = GoldDark,
     tertiary = PinkDark,
-    tertiaryContainer = PinkLight.copy(alpha = 0.15f),
-    surface = WarmCream,
+    surface = Cream,
     onSurface = TextDark,
-    surfaceVariant = WarmCreamAlt,
+    surfaceVariant = CreamAlt,
     onSurfaceVariant = TextMuted,
-    background = WarmCream,
+    background = White,
     onBackground = TextDark,
-    outline = Border,
-    outlineVariant = Border.copy(alpha = 0.5f),
-    error = PinkDark,
-    onError = White,
+    outline = TextLight,
+    outlineVariant = TextLight.copy(alpha = 0.3f),
     inverseSurface = TextDark,
-    inverseOnSurface = WarmCream,
+    inverseOnSurface = Cream,
+    surfaceContainerLowest = White,
+    surfaceContainerLow = Cream,
+    surfaceContainer = CreamAlt,
 )
 
 private val DarkColorScheme = darkColorScheme(
     primary = PinkLight,
     onPrimary = NearBlack,
-    primaryContainer = PinkDark.copy(alpha = 0.4f),
+    primaryContainer = PinkDark.copy(alpha = 0.3f),
     onPrimaryContainer = PinkLight,
     secondary = Gold,
     onSecondary = NearBlack,
-    secondaryContainer = GoldDark.copy(alpha = 0.3f),
+    secondaryContainer = GoldDark.copy(alpha = 0.2f),
     onSecondaryContainer = Gold,
     tertiary = PinkLight,
-    tertiaryContainer = PinkDark.copy(alpha = 0.3f),
     surface = DarkSurface,
-    onSurface = WarmCream,
+    onSurface = White.copy(alpha = 0.92f),
     surfaceVariant = DarkSurfaceAlt,
-    onSurfaceVariant = Border,
+    onSurfaceVariant = TextLight,
     background = NearBlack,
-    onBackground = WarmCream,
+    onBackground = White.copy(alpha = 0.92f),
     outline = TextMuted,
-    outlineVariant = TextMuted.copy(alpha = 0.3f),
-    error = PinkLight,
-    onError = NearBlack,
-    inverseSurface = WarmCream,
+    outlineVariant = TextMuted.copy(alpha = 0.2f),
+    inverseSurface = Cream,
     inverseOnSurface = TextDark,
+    surfaceContainerLowest = NearBlack,
+    surfaceContainerLow = DarkSurface,
+    surfaceContainer = DarkSurfaceAlt,
 )
 
-private val ChoreRollTypography = Typography(
+private val AppTypography = Typography(
+    displayLarge = TextStyle(
+        fontWeight = FontWeight.Black,
+        fontSize = 34.sp,
+        letterSpacing = (-1.5).sp,
+        lineHeight = 40.sp
+    ),
     headlineLarge = TextStyle(
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Black,
         fontSize = 28.sp,
-        letterSpacing = (-0.5).sp
+        letterSpacing = (-1).sp,
+        lineHeight = 34.sp
     ),
     headlineMedium = TextStyle(
         fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
-        letterSpacing = (-0.3).sp
+        fontSize = 22.sp,
+        letterSpacing = (-0.5).sp,
+        lineHeight = 28.sp
     ),
     headlineSmall = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp
     ),
     titleLarge = TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        letterSpacing = 0.sp
+        fontSize = 17.sp,
+        letterSpacing = (-0.2).sp,
+        lineHeight = 22.sp
     ),
     titleMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        letterSpacing = 0.1.sp
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 15.sp,
+        letterSpacing = 0.sp,
+        lineHeight = 20.sp
     ),
     bodyLarge = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        letterSpacing = 0.3.sp
+        letterSpacing = 0.sp,
+        lineHeight = 24.sp
     ),
     bodyMedium = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        letterSpacing = 0.2.sp
+        letterSpacing = 0.1.sp,
+        lineHeight = 20.sp
+    ),
+    bodySmall = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        letterSpacing = 0.2.sp,
+        lineHeight = 16.sp
     ),
     labelLarge = TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 13.sp,
+        letterSpacing = 0.4.sp,
+        lineHeight = 16.sp
+    ),
+    labelMedium = TextStyle(
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        letterSpacing = 0.3.sp
     ),
     labelSmall = TextStyle(
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.3.sp
     ),
 )
 
@@ -113,11 +137,9 @@ fun ChoreRollTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = ChoreRollTypography,
+        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+        typography = AppTypography,
         content = content
     )
 }
