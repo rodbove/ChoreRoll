@@ -1,8 +1,8 @@
 package com.choreroll.app.di
 
 import android.content.Context
-import androidx.room.Room
 import com.choreroll.app.data.db.AppDatabase
+import com.choreroll.app.data.db.DatabaseProvider
 import com.choreroll.app.data.db.dao.CompletionDao
 import com.choreroll.app.data.repository.CategoryRepository
 import com.choreroll.app.data.repository.TaskRepository
@@ -13,11 +13,7 @@ import com.choreroll.app.domain.usecase.SpinTaskUseCase
 class AppContainer(context: Context) {
 
     private val database: AppDatabase by lazy {
-        Room.databaseBuilder(
-            context.applicationContext,
-            AppDatabase::class.java,
-            "choreroll.db"
-        ).build()
+        DatabaseProvider.getDatabase(context)
     }
 
     val taskRepository: TaskRepository by lazy {
