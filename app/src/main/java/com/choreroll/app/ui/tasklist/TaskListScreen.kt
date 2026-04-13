@@ -18,8 +18,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material.icons.outlined.TaskAlt
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -100,6 +103,7 @@ fun TaskListScreen(
                         TaskRow(
                             task = task,
                             onClick = { onEditTask(task.id) },
+                            onComplete = { viewModel.completeTask(task) },
                             onDelete = { viewModel.deleteTask(task) }
                         )
                     }
@@ -114,6 +118,7 @@ fun TaskListScreen(
 private fun TaskRow(
     task: TaskWithCategory,
     onClick: () -> Unit,
+    onComplete: () -> Unit,
     onDelete: () -> Unit
 ) {
     val archived = task.isArchived
@@ -122,6 +127,7 @@ private fun TaskRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
+            .clickable(enabled = !archived, onClick = onClick)
             .background(
                 if (archived)
                     MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
@@ -197,6 +203,20 @@ private fun TaskRow(
                         },
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            if (!archived) {
+                IconButton(
+                    onClick = onComplete,
+                    modifier = Modifier.size(34.dp)
+                ) {
+                    Icon(
+                        Icons.Outlined.CheckCircleOutline,
+                        contentDescription = "Complete",
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }

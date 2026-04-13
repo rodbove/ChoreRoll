@@ -130,7 +130,7 @@ fun ChoreRollNavGraph(
             composable<TaskListRoute> {
                 TaskListScreen(
                     viewModel = viewModel {
-                        TaskListViewModel(container.taskRepository, container.categoryRepository)
+                        TaskListViewModel(container.taskRepository, container.categoryRepository, container.completeTaskUseCase)
                     },
                     onAddTask = { navController.navigate(AddEditTaskRoute()) },
                     onEditTask = { taskId -> navController.navigate(AddEditTaskRoute(taskId)) }

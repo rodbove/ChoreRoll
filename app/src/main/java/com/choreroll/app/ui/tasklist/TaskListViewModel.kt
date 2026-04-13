@@ -2,10 +2,10 @@ package com.choreroll.app.ui.tasklist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.choreroll.app.data.model.TaskEntity
 import com.choreroll.app.data.model.TaskWithCategory
 import com.choreroll.app.data.repository.CategoryRepository
 import com.choreroll.app.data.repository.TaskRepository
+import com.choreroll.app.domain.usecase.CompleteTaskUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class TaskListViewModel(
     private val taskRepository: TaskRepository,
-    categoryRepository: CategoryRepository
+    categoryRepository: CategoryRepository,
+    private val completeTaskUseCase: CompleteTaskUseCase
 ) : ViewModel() {
 
     data class UiState(
@@ -37,6 +38,13 @@ class TaskListViewModel(
         viewModelScope.launch {
             val entity = taskRepository.getById(task.id) ?: return@launch
             taskRepository.delete(entity)
+        }
+    }
+
+    fun completeTask(task: TaskWithCategory) {
+        viewModelScope.launch {
+            val entity = taskRepository.getById(task.id) ?: return@launch
+            completeTaskUseCase(entity)
         }
     }
 }
